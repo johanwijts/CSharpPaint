@@ -11,7 +11,7 @@ namespace CSharpPaint.Commands
         }
 
         private readonly Editor editor;
-        private Shape? currentShape;
+        private readonly Shape? currentShape;
 
         public override void Execute()
         {

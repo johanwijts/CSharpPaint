@@ -55,8 +55,9 @@ namespace CSharpPaint
         {
             if (rightMouseButtonDown)
             {
-                editor.Stop_Sizing();
                 rightMouseButtonDown = false;
+                editor.Stop_Moving();
+                invoker.Execute(new MoveCommand(editor));
             }
             else if (middleMouseButtonDown)
             {

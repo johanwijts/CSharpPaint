@@ -17,19 +17,25 @@ namespace CSharpPaint
         }
 
         public Canvas canvas;
-        private RadioButton rectangleRadioButton;
-        private RadioButton ellipseRadioButton;
+        private readonly RadioButton rectangleRadioButton;
+        private readonly RadioButton ellipseRadioButton;
 
         private bool isSizing;
         private bool isDrawing;
         private Point startPoint;
         private Shape? currentShape;
+        private (double offsetX, double offsetY) shapePositionOffsetAfterMoving;
         private bool isDragging;
         private Point lastMousePosition;
 
         public Shape? GetCurrentShape()
         {
             return currentShape;
+        }
+
+        public (double offsetX, double offsetY) GetShapePositionOffsetAfterMoving()
+        {
+            return shapePositionOffsetAfterMoving;
         }
 
         public void Start_Drawing(object sender, MouseButtonEventArgs e)
@@ -115,14 +121,23 @@ namespace CSharpPaint
             canvas.Children.Remove(currentShape);
         }
 
-        public void Stop_Sizing()
+        public void Stop_Moving()
         {
             isDragging = false;
+            shapePositionOffsetAfterMoving.offsetX -= Canvas.GetLeft(currentShape);
+            shapePositionOffsetAfterMoving.offsetY -= Canvas.GetTop(currentShape);
         }
 
         // We need a actual action of the drawing to be able to implement the DrawCommand
         public void Finalize_Drawing(Shape shape)
         {
+            canvas.Children.Add(shape);
+        }
+
+        // We need a actual action of the sizing to be able to implement the SizeCommand
+        public void Finalize_Moving(Shape shape)
+        {
+            canvas.Children.Remove(currentShape);
             canvas.Children.Add(shape);
         }
 
@@ -184,6 +199,8 @@ namespace CSharpPaint
                 if (hitTestResult.VisualHit is Shape)
                 {
                     currentShape = (Shape)hitTestResult.VisualHit;
+                    shapePositionOffsetAfterMoving = 
+                        (Canvas.GetLeft(currentShape), Canvas.GetTop(currentShape));
                     isDragging = true;
                     lastMousePosition = mousePosition;
                 }
