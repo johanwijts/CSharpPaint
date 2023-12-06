@@ -12,6 +12,7 @@ namespace CSharpPaint.Invokers
         {
             command.Execute();
             undoStack.Push(command);
+            redoStack.Clear();
         }
 
         public void Undo()

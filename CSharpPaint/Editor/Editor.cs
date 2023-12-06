@@ -49,7 +49,6 @@ namespace CSharpPaint
 
             if (e.RightButton == MouseButtonState.Pressed)
             {
-                HandleRightMouseButtonDown(e);
                 return;
             }
 
@@ -118,7 +117,6 @@ namespace CSharpPaint
         public void Stop_Drawing()
         {
             isDrawing = false;
-            canvas.Children.Remove(currentShape);
         }
 
         public void Stop_Moving()
@@ -131,13 +129,14 @@ namespace CSharpPaint
         // We need a actual action of the drawing to be able to implement the DrawCommand
         public void Finalize_Drawing(Shape shape)
         {
+            canvas.Children.Remove(shape);
             canvas.Children.Add(shape);
         }
 
         // We need a actual action of the sizing to be able to implement the SizeCommand
         public void Finalize_Moving(Shape shape)
         {
-            canvas.Children.Remove(currentShape);
+            canvas.Children.Remove(shape);
             canvas.Children.Add(shape);
         }
 
@@ -189,7 +188,7 @@ namespace CSharpPaint
             }
         }
 
-        private void HandleRightMouseButtonDown(MouseButtonEventArgs e)
+        public bool Check_For_Drag_Connect(MouseButtonEventArgs e)
         {
             Point mousePosition = e.GetPosition(canvas);
             var hitTestResult = VisualTreeHelper.HitTest(canvas, mousePosition);
@@ -203,8 +202,10 @@ namespace CSharpPaint
                         (Canvas.GetLeft(currentShape), Canvas.GetTop(currentShape));
                     isDragging = true;
                     lastMousePosition = mousePosition;
+                    return true;
                 }
             }
+            return false;
         }
 
         private void HandleMiddleMouseButtonDown(MouseButtonEventArgs e)

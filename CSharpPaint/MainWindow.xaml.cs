@@ -16,6 +16,7 @@ namespace CSharpPaint
         private bool rightMouseButtonDown;
         private bool middleMouseButtonDown;
         private bool leftMouseButtonDown;
+        private bool shapeIsConnectedToMouse;
 
         public MainWindow()
         {
@@ -29,6 +30,7 @@ namespace CSharpPaint
             if (e.RightButton == MouseButtonState.Pressed)
             {
                 rightMouseButtonDown = true;
+                shapeIsConnectedToMouse = editor.Check_For_Drag_Connect(e);
             }
             else if (e.MiddleButton == MouseButtonState.Pressed)
             {
@@ -57,7 +59,10 @@ namespace CSharpPaint
             {
                 rightMouseButtonDown = false;
                 editor.Stop_Moving();
-                invoker.Execute(new MoveCommand(editor));
+                if (shapeIsConnectedToMouse)
+                {
+                    invoker.Execute(new MoveCommand(editor));
+                }
             }
             else if (middleMouseButtonDown)
             {
