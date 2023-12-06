@@ -13,6 +13,10 @@ namespace CSharpPaint
         private readonly Editor editor;
         private readonly Invoker invoker;
 
+        private bool rightMouseButtonDown;
+        private bool middleMouseButtonDown;
+        private bool leftMouseButtonDown;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -22,22 +26,48 @@ namespace CSharpPaint
 
         private void Canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            invoker.Execute(new DrawCommand(editor, sender, e));
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                rightMouseButtonDown = true;
+            }
+            else if (e.MiddleButton == MouseButtonState.Pressed)
+            {
+                middleMouseButtonDown = true;
+            }
+            else if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                leftMouseButtonDown = true;
+            }
+            editor.Start_Drawing(sender, e);
         }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
         {
-            editor.Editor_MouseMove(sender, e);
+            editor.Handle_Movement(sender, e);
         }
 
         private void Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            editor.Editor_MouseWheel(sender, e);
+            editor.Handle_Sizing(sender, e);
         }
 
         private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            editor.Editor_MouseUp(sender, e);
+            if (rightMouseButtonDown)
+            {
+                editor.Stop_Sizing();
+                rightMouseButtonDown = false;
+            }
+            else if (middleMouseButtonDown)
+            {
+                middleMouseButtonDown = false;
+            }
+            else if (leftMouseButtonDown)
+            {
+                leftMouseButtonDown = false;
+                editor.Stop_Drawing();
+                invoker.Execute(new DrawCommand(editor));
+            }
         }     
 
         private void Canvas_KeyDown(object sender, KeyEventArgs e)

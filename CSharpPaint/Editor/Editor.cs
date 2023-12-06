@@ -27,7 +27,12 @@ namespace CSharpPaint
         private bool isDragging;
         private Point lastMousePosition;
 
-        public void Editor_MouseDown(object sender, MouseButtonEventArgs e)
+        public Shape? GetCurrentShape()
+        {
+            return currentShape;
+        }
+
+        public void Start_Drawing(object sender, MouseButtonEventArgs e)
         {
             isSizing = false;
 
@@ -76,40 +81,52 @@ namespace CSharpPaint
             }
         }
 
-        public void Editor_MouseMove(object sender, MouseEventArgs e)
+        public void Handle_Movement(object sender, MouseEventArgs e)
         {
             if (isDragging)
             {
-                HandleDragging(e);
+                Handle_Dragging(e);
             }
             else if (isDrawing && currentShape != null)
             {
-                HandleDrawing(e);
+                Handle_Drawing(e);
             }
         }
 
-        public void Editor_MouseWheel(object sender, MouseWheelEventArgs e)
+        public void Handle_Sizing(object sender, MouseWheelEventArgs e)
         {
-            if (isSizing)
+            if (isSizing && currentShape != null)
             {
-                HandleSizing(e);
+                // Adjust the width and height based on the mouse wheel delta
+                double delta = e.Delta / 120.0;
+                double scaleFactor = 1.1;
+
+                double newWidth = currentShape.Width * Math.Pow(scaleFactor, delta);
+                double newHeight = currentShape.Height * Math.Pow(scaleFactor, delta);
+
+                currentShape.Width = Math.Max(newWidth, 1);
+                currentShape.Height = Math.Max(newHeight, 1);
             }
         }
 
-        public void Editor_MouseUp(object sender, MouseButtonEventArgs e)
+        public void Stop_Drawing()
         {
-            if (isDrawing)
-            {
-                isDrawing = false;
-            }
-
-            if (isDragging)
-            {
-                isDragging = false;
-            }
+            isDrawing = false;
+            canvas.Children.Remove(currentShape);
         }
 
-        private void HandleDragging(MouseEventArgs e)
+        public void Stop_Sizing()
+        {
+            isDragging = false;
+        }
+
+        // We need a actual action of the drawing to be able to implement the DrawCommand
+        public void Finalize_Drawing(Shape shape)
+        {
+            canvas.Children.Add(shape);
+        }
+
+        private void Handle_Dragging(MouseEventArgs e)
         {
             Point currentPosition = e.GetPosition(canvas);
             double offsetX = currentPosition.X - lastMousePosition.X;
@@ -121,7 +138,7 @@ namespace CSharpPaint
             lastMousePosition = currentPosition;
         }
 
-        private void HandleDrawing(MouseEventArgs e)
+        private void Handle_Drawing(MouseEventArgs e)
         {
             Point currentPoint = e.GetPosition(canvas);
             double width = currentPoint.X - startPoint.X;
@@ -154,22 +171,6 @@ namespace CSharpPaint
             {
                 (currentShape as Ellipse)!.Width = width;
                 (currentShape as Ellipse)!.Height = height;
-            }
-        }
-
-        private void HandleSizing(MouseWheelEventArgs e)
-        {
-            if (isSizing && currentShape != null)
-            {
-                // Adjust the width and height based on the mouse wheel delta
-                double delta = e.Delta / 120.0;
-                double scaleFactor = 1.1;
-
-                double newWidth = currentShape.Width * Math.Pow(scaleFactor, delta);
-                double newHeight = currentShape.Height * Math.Pow(scaleFactor, delta);
-
-                currentShape.Width = Math.Max(newWidth, 1);
-                currentShape.Height = Math.Max(newHeight, 1);
             }
         }
 

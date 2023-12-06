@@ -1,23 +1,26 @@
-﻿using System.Windows.Input;
+﻿using System.Windows.Shapes;
 
 namespace CSharpPaint.Commands
 {
     public class DrawCommand : Command
     {
-        public DrawCommand(Editor Editor, object Sender, MouseButtonEventArgs E)
+        public DrawCommand(Editor Editor)
         {
             this.editor = Editor;
-            this.sender = Sender;
-            this.e = E;
+            this.currentShape = Editor.GetCurrentShape();
         }
 
         private readonly Editor editor;
-        private readonly object sender;
-        private readonly MouseButtonEventArgs e;
+        private Shape? currentShape;
 
         public override void Execute()
         {
-            editor.Editor_MouseDown(sender, e);
+            if (currentShape == null)
+            {
+                return;
+            }
+
+            editor.Finalize_Drawing(currentShape);
         }
 
         public override void Undo()
