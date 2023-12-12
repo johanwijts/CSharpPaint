@@ -1,9 +1,9 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Windows;
-using System;
 
 namespace CSharpPaint
 {
@@ -20,11 +20,12 @@ namespace CSharpPaint
         private readonly RadioButton rectangleRadioButton;
         private readonly RadioButton ellipseRadioButton;
 
-        private bool isSizing;
+        public bool isSizing;
         private bool isDrawing;
         private Point startPoint;
         private Shape? currentShape;
         private (double offsetX, double offsetY) shapePositionOffsetAfterMoving;
+        private (double width, double height) shapeSizeBeforeSizing;
         private bool isDragging;
         private Point lastMousePosition;
 
@@ -38,9 +39,14 @@ namespace CSharpPaint
             return shapePositionOffsetAfterMoving;
         }
 
+        public (double width, double height) GetShapeSizeBeforeSizing()
+        {
+            return shapeSizeBeforeSizing;
+        }
+
         public void Start_Drawing(object sender, MouseButtonEventArgs e)
         {
-            isSizing = false;
+            Stop_Sizing();
 
             if (currentShape != null)
             {
@@ -54,7 +60,6 @@ namespace CSharpPaint
 
             if (e.MiddleButton == MouseButtonState.Pressed)
             {
-                HandleMiddleMouseButtonDown(e);
                 return;
             }
 
@@ -126,15 +131,24 @@ namespace CSharpPaint
             shapePositionOffsetAfterMoving.offsetY -= Canvas.GetTop(currentShape);
         }
 
-        // We need a actual action of the drawing to be able to implement the DrawCommand
+        public void Stop_Sizing()
+        {
+            isSizing = false;
+        }
+
         public void Finalize_Drawing(Shape shape)
         {
             canvas.Children.Remove(shape);
             canvas.Children.Add(shape);
         }
 
-        // We need a actual action of the sizing to be able to implement the SizeCommand
         public void Finalize_Moving(Shape shape)
+        {
+            canvas.Children.Remove(shape);
+            canvas.Children.Add(shape);
+        }
+
+        public void Finalize_Sizing(Shape shape)
         {
             canvas.Children.Remove(shape);
             canvas.Children.Add(shape);
@@ -208,10 +222,8 @@ namespace CSharpPaint
             return false;
         }
 
-        private void HandleMiddleMouseButtonDown(MouseButtonEventArgs e)
+        public bool Check_For_Sizing_Connect(MouseButtonEventArgs e)
         {
-            isSizing = false;
-
             if (currentShape != null)
             {
                 currentShape.Stroke = Brushes.Black;
@@ -224,12 +236,26 @@ namespace CSharpPaint
             {
                 if (hitTestResult.VisualHit is Shape)
                 {
+                    if (currentShape is Rectangle)
+                    {
+                        shapeSizeBeforeSizing.width = (currentShape as Rectangle)!.Width;
+                        shapeSizeBeforeSizing.height = (currentShape as Rectangle)!.Height;
+                    }
+                    else if (currentShape is Ellipse)
+                    {
+                        shapeSizeBeforeSizing.width = (currentShape as Ellipse)!.Width;
+                        shapeSizeBeforeSizing.height = (currentShape as Ellipse)!.Height;
+                    }
+
                     currentShape = (Shape)hitTestResult.VisualHit;
                     currentShape.Stroke = Brushes.Blue;
                     isSizing = true;
                     lastMousePosition = mousePosition;
+                    return true;
                 }
             }
+            Stop_Sizing();
+            return false;
         }
     }
 }

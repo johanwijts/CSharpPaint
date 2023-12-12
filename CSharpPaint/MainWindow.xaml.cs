@@ -35,11 +35,20 @@ namespace CSharpPaint
             else if (e.MiddleButton == MouseButtonState.Pressed)
             {
                 middleMouseButtonDown = true;
+                shapeIsConnectedToMouse = editor.Check_For_Sizing_Connect(e);
+
+                if (shapeIsConnectedToMouse && editor.isSizing)
+                {
+                    invoker.Execute(new SizeCommand(editor));
+                    shapeIsConnectedToMouse = false;
+                }
+                return;
             }
             else if (e.LeftButton == MouseButtonState.Pressed)
             {
                 leftMouseButtonDown = true;
             }
+
             editor.Start_Drawing(sender, e);
         }
 
@@ -62,6 +71,7 @@ namespace CSharpPaint
                 if (shapeIsConnectedToMouse)
                 {
                     invoker.Execute(new MoveCommand(editor));
+                    shapeIsConnectedToMouse = false;
                 }
             }
             else if (middleMouseButtonDown)
@@ -73,16 +83,17 @@ namespace CSharpPaint
                 leftMouseButtonDown = false;
                 editor.Stop_Drawing();
                 invoker.Execute(new DrawCommand(editor));
+                shapeIsConnectedToMouse = false;
             }
         }     
 
         private void Canvas_KeyDown(object sender, KeyEventArgs e)
         {
-            if(e.Key == Key.Z && Keyboard.Modifiers == ModifierKeys.Control)
+            if(e.Key == Key.Z && Keyboard.Modifiers == ModifierKeys.Control && !leftMouseButtonDown)
             {
                 invoker.Undo();
             }
-            else if (e.Key == Key.Y && Keyboard.Modifiers == ModifierKeys.Control)
+            else if (e.Key == Key.Y && Keyboard.Modifiers == ModifierKeys.Control && !leftMouseButtonDown)
             {
                 invoker.Redo();
             }
