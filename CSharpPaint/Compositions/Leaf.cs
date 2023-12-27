@@ -28,9 +28,18 @@ namespace CSharpPaint.Compositions
             Canvas.SetTop(shape, Canvas.GetTop(shape) + offsetY);
         }
 
-        public override void SizeOperation()
+        public override void SizeOperation(double sizeDifference)
         {
-            // Implement groupsizing
+            var newWidth = shape.Width + sizeDifference;
+            var newHeight = shape.Height + sizeDifference;
+
+            if (newWidth < 0 || newHeight < 0)
+            {
+                return;
+            }
+
+            shape.Width = newWidth;
+            shape.Height = newHeight;
         }
 
         public override bool IsComposite()

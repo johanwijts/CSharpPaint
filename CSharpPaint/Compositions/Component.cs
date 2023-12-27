@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Input;
 
 namespace CSharpPaint.Compositions
 {
@@ -7,7 +8,7 @@ namespace CSharpPaint.Compositions
     {
         public abstract void MoveOperation(Point compositeMiddle);
 
-        public abstract void SizeOperation();
+        public abstract void SizeOperation(double sizeDifference);
 
         public virtual void Add(Component component)
         {

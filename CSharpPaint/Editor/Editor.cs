@@ -104,55 +104,20 @@ namespace CSharpPaint
             }
         }
 
-        public void Handle_Sizing(object sender, MouseWheelEventArgs e)
+        public void Handle_Sizing(object sender, MouseWheelEventArgs e, Shape? shapeToSize)
         {
-            if (isSizing && currentShape != null)
+            if (isSizing && shapeToSize != null)
             {
                 // Adjust the width and height based on the mouse wheel delta
                 double delta = e.Delta / 120.0;
                 double scaleFactor = 1.1;
 
-                double newWidth = currentShape.Width * Math.Pow(scaleFactor, delta);
-                double newHeight = currentShape.Height * Math.Pow(scaleFactor, delta);
+                double newWidth = shapeToSize.Width * Math.Pow(scaleFactor, delta);
+                double newHeight = shapeToSize.Height * Math.Pow(scaleFactor, delta);
 
-                currentShape.Width = Math.Max(newWidth, 1);
-                currentShape.Height = Math.Max(newHeight, 1);
+                shapeToSize.Width = Math.Max(newWidth, 1);
+                shapeToSize.Height = Math.Max(newHeight, 1);
             }
-        }
-
-        public void Stop_Drawing()
-        {
-            isDrawing = false;
-        }
-
-        public void Stop_Moving()
-        {
-            isDragging = false;
-            shapePositionOffsetAfterMoving.offsetX -= Canvas.GetLeft(currentShape);
-            shapePositionOffsetAfterMoving.offsetY -= Canvas.GetTop(currentShape);
-        }
-
-        public void Stop_Sizing()
-        {
-            isSizing = false;
-        }
-
-        public void Finalize_Drawing(Shape shape)
-        {
-            canvas.Children.Remove(shape);
-            canvas.Children.Add(shape);
-        }
-
-        public void Finalize_Moving(Shape shape)
-        {
-            canvas.Children.Remove(shape);
-            canvas.Children.Add(shape);
-        }
-
-        public void Finalize_Sizing(Shape shape)
-        {
-            canvas.Children.Remove(shape);
-            canvas.Children.Add(shape);
         }
 
         public void Handle_Dragging(MouseEventArgs e, Shape shapeToMove)
@@ -165,6 +130,18 @@ namespace CSharpPaint
             Canvas.SetTop(shapeToMove, Canvas.GetTop(shapeToMove) + offsetY);
 
             lastMousePosition = currentPosition;
+        }
+
+        public void Handle_Group_Dragging(MouseButtonEventArgs e, Shape shapeToMove)
+        {
+            Point mousePosition = e.GetPosition(canvas);
+
+            shapePositionOffsetAfterMoving =
+                (Canvas.GetLeft(currentShape), Canvas.GetTop(currentShape));
+            isDragging = true;
+            lastMousePosition = mousePosition;
+
+            Handle_Dragging(e, shapeToMove);
         }
 
         private void Handle_Drawing(MouseEventArgs e)
@@ -223,18 +200,6 @@ namespace CSharpPaint
             return false;
         }
 
-        public void Handle_Group_Dragging(MouseButtonEventArgs e, Shape shapeToMove)
-        {
-            Point mousePosition = e.GetPosition(canvas);
-
-            shapePositionOffsetAfterMoving =
-                (Canvas.GetLeft(currentShape), Canvas.GetTop(currentShape));
-            isDragging = true;
-            lastMousePosition = mousePosition;
-
-            Handle_Dragging(e, shapeToMove);
-        }
-
         public bool Check_For_Sizing_Connect(MouseButtonEventArgs e)
         {
             if (currentShape != null)
@@ -281,24 +246,47 @@ namespace CSharpPaint
                 if (hitTestResult.VisualHit is Shape)
                 {
                     Shape leafShape;
-
-                    if (currentShape is Rectangle)
-                    {
-                        shapeSizeBeforeSizing.width = (currentShape as Rectangle)!.Width;
-                        shapeSizeBeforeSizing.height = (currentShape as Rectangle)!.Height;
-                    }
-                    else if (currentShape is Ellipse)
-                    {
-                        shapeSizeBeforeSizing.width = (currentShape as Ellipse)!.Width;
-                        shapeSizeBeforeSizing.height = (currentShape as Ellipse)!.Height;
-                    }
-
                     leafShape = (Shape)hitTestResult.VisualHit;
                     leafShape.Stroke = Brushes.Green;
 
                     group.Add(new Leaf(leafShape, canvas, e));
                 }
             }
+        }
+
+        public void Stop_Drawing()
+        {
+            isDrawing = false;
+        }
+
+        public void Stop_Moving()
+        {
+            isDragging = false;
+            shapePositionOffsetAfterMoving.offsetX -= Canvas.GetLeft(currentShape);
+            shapePositionOffsetAfterMoving.offsetY -= Canvas.GetTop(currentShape);
+        }
+
+        public void Stop_Sizing()
+        {
+            isSizing = false;
+        }
+
+        public void Finalize_Drawing(Shape shape)
+        {
+            canvas.Children.Remove(shape);
+            canvas.Children.Add(shape);
+        }
+
+        public void Finalize_Moving(Shape shape)
+        {
+            canvas.Children.Remove(shape);
+            canvas.Children.Add(shape);
+        }
+
+        public void Finalize_Sizing(Shape shape)
+        {
+            canvas.Children.Remove(shape);
+            canvas.Children.Add(shape);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using CSharpPaint.Commands;
 using CSharpPaint.Compositions;
 using CSharpPaint.Invokers;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Input;
 
@@ -29,8 +28,7 @@ namespace CSharpPaint
             editor = new Editor
                 (canvas,
                 rectangleRadioButton,
-                ellipseRadioButton,
-                groupingRadioButton);
+                ellipseRadioButton);
             invoker = new Invoker();
 
             group = new Composite(invoker, editor);
@@ -85,7 +83,12 @@ namespace CSharpPaint
 
         private void Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            editor.Handle_Sizing(sender, e);
+            if (groupingRadioButton.IsChecked == true)
+            {
+                return;
+            }
+
+            editor.Handle_Sizing(sender, e, editor.GetCurrentShape());
         }
 
         private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
@@ -138,6 +141,16 @@ namespace CSharpPaint
             {
                 keyIsDown = true;
                 invoker.Redo();
+            }
+            else if (e.Key == Key.PageUp && !leftMouseButtonDown && !keyIsDown)
+            {
+                keyIsDown = true;
+                group.SizeOperation(10);
+            }
+            else if (e.Key == Key.PageDown && !leftMouseButtonDown && !keyIsDown)
+            {
+                keyIsDown = true;
+                group.SizeOperation(-10);
             }
         }
 

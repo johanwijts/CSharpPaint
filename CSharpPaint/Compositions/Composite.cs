@@ -21,6 +21,11 @@ namespace CSharpPaint.Compositions
 
         public override void MoveOperation(Point compositeMiddle)
         {
+            if (this.children.Count == 0)
+            {
+                return;
+            }
+
             var shapes = new List<Shape>();
             var leafPositions = new List<Point>();
             var leafPositionsBeforeMoving = new List<Point>();
@@ -36,7 +41,6 @@ namespace CSharpPaint.Compositions
                     var leafPoint = new Point(Canvas.GetLeft(leaf.shape), Canvas.GetTop(leaf.shape));
                     leafPositions.Add(leafPoint);
                     leafPositionsBeforeMoving.Add(leafPoint);
-                    continue;
                 }
             }
 
@@ -68,12 +72,50 @@ namespace CSharpPaint.Compositions
             invoker.Execute(new MoveGroupCommand(editor, shapes, leafPositionsBeforeMoving, leafPositionsAfterMoving));
         }
 
-        public override void SizeOperation()
+        public override void SizeOperation(double sizeDifference)
         {
+            if (this.children.Count == 0)
+            {
+                return;
+            }
+
+            var shapes = new List<Shape>();
+            var leafWidthsBeforeSizing = new List<double>();
+            var leafHeightsBeforeSizing = new List<double>();
+            var leafWidthsAfterSizing = new List<double>();
+            var leafHeightsAfterSizing = new List<double>();
+
             foreach (var component in this.children)
             {
-                // Implement groupsizing
+                if (!component.IsComposite())
+                {
+                    shapes.Add(((Leaf)component).shape);
+
+                    var leaf = (Leaf)component;
+                    leafWidthsBeforeSizing.Add(leaf.shape.Width);
+                    leafHeightsBeforeSizing.Add(leaf.shape.Height);
+                } 
             }
+
+            foreach (var component in this.children)
+            {
+                if (!component.IsComposite())
+                {
+                    component.SizeOperation(sizeDifference);
+                    var leaf = (Leaf)component;
+                    leafWidthsAfterSizing.Add(leaf.shape.Width);
+                    leafHeightsAfterSizing.Add(leaf.shape.Height);
+                }
+            }
+
+            invoker.Execute(
+                new SizeGroupCommand(
+                    editor, 
+                    shapes,
+                    leafWidthsBeforeSizing,
+                    leafHeightsBeforeSizing,
+                    leafWidthsAfterSizing,
+                    leafHeightsAfterSizing));
         }
 
         public override void Add(Component component)
