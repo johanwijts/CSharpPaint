@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CSharpPaint.Compositions;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -9,7 +10,7 @@ namespace CSharpPaint
 {
     public class Editor
     {
-        public Editor(Canvas Canvas, RadioButton RectangleRadioButton, RadioButton EllipseRadioButton)
+        public Editor(Canvas Canvas,RadioButton RectangleRadioButton, RadioButton EllipseRadioButton)
         {
             this.canvas = Canvas;
             this.rectangleRadioButton = RectangleRadioButton;
@@ -95,7 +96,7 @@ namespace CSharpPaint
         {
             if (isDragging)
             {
-                Handle_Dragging(e);
+                Handle_Dragging(e, currentShape!);
             }
             else if (isDrawing && currentShape != null)
             {
@@ -154,14 +155,14 @@ namespace CSharpPaint
             canvas.Children.Add(shape);
         }
 
-        private void Handle_Dragging(MouseEventArgs e)
+        public void Handle_Dragging(MouseEventArgs e, Shape shapeToMove)
         {
             Point currentPosition = e.GetPosition(canvas);
             double offsetX = currentPosition.X - lastMousePosition.X;
             double offsetY = currentPosition.Y - lastMousePosition.Y;
 
-            Canvas.SetLeft(currentShape, Canvas.GetLeft(currentShape) + offsetX);
-            Canvas.SetTop(currentShape, Canvas.GetTop(currentShape) + offsetY);
+            Canvas.SetLeft(shapeToMove, Canvas.GetLeft(shapeToMove) + offsetX);
+            Canvas.SetTop(shapeToMove, Canvas.GetTop(shapeToMove) + offsetY);
 
             lastMousePosition = currentPosition;
         }
@@ -222,6 +223,18 @@ namespace CSharpPaint
             return false;
         }
 
+        public void Handle_Group_Dragging(MouseButtonEventArgs e, Shape shapeToMove)
+        {
+            Point mousePosition = e.GetPosition(canvas);
+
+            shapePositionOffsetAfterMoving =
+                (Canvas.GetLeft(currentShape), Canvas.GetTop(currentShape));
+            isDragging = true;
+            lastMousePosition = mousePosition;
+
+            Handle_Dragging(e, shapeToMove);
+        }
+
         public bool Check_For_Sizing_Connect(MouseButtonEventArgs e)
         {
             if (currentShape != null)
@@ -256,6 +269,36 @@ namespace CSharpPaint
             }
             Stop_Sizing();
             return false;
+        }
+
+        public void Check_For_Grouping_Connect(MouseButtonEventArgs e, Composite group)
+        {
+            Point mousePosition = e.GetPosition(canvas);
+            var hitTestResult = VisualTreeHelper.HitTest(canvas, mousePosition);
+
+            if (hitTestResult != null)
+            {
+                if (hitTestResult.VisualHit is Shape)
+                {
+                    Shape leafShape;
+
+                    if (currentShape is Rectangle)
+                    {
+                        shapeSizeBeforeSizing.width = (currentShape as Rectangle)!.Width;
+                        shapeSizeBeforeSizing.height = (currentShape as Rectangle)!.Height;
+                    }
+                    else if (currentShape is Ellipse)
+                    {
+                        shapeSizeBeforeSizing.width = (currentShape as Ellipse)!.Width;
+                        shapeSizeBeforeSizing.height = (currentShape as Ellipse)!.Height;
+                    }
+
+                    leafShape = (Shape)hitTestResult.VisualHit;
+                    leafShape.Stroke = Brushes.Green;
+
+                    group.Add(new Leaf(leafShape, canvas, e));
+                }
+            }
         }
     }
 }

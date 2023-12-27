@@ -12,7 +12,7 @@ namespace CSharpPaint.Commands
         }
 
         private readonly Editor editor;
-        private readonly Shape? currentShape;
+        private Shape? currentShape;
         private readonly (double offsetX, double offsetY) shapeSizeBeforeSizing;
 
         public override void Execute()
@@ -34,6 +34,11 @@ namespace CSharpPaint.Commands
 
             currentShape.Width = shapeSizeBeforeSizing.offsetX;
             currentShape.Height = shapeSizeBeforeSizing.offsetY;
+        }
+
+        public void SetCurrentShape(Shape shape)
+        {
+            currentShape = shape;
         }
     }
 }
