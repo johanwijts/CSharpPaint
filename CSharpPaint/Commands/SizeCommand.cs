@@ -1,4 +1,4 @@
-﻿using System.Windows.Shapes;
+﻿using CSharpPaint.Editors.Shapes;
 
 namespace CSharpPaint.Commands
 {
@@ -12,7 +12,7 @@ namespace CSharpPaint.Commands
         }
 
         private readonly Editor editor;
-        private Shape? currentShape;
+        private BaseShape? currentShape;
         private readonly (double offsetX, double offsetY) shapeSizeBeforeSizing;
 
         public override void Execute()
@@ -27,16 +27,16 @@ namespace CSharpPaint.Commands
 
         public override void Undo()
         {
-            if (currentShape == null)
+            if (currentShape?.shape == null)
             {
                 return;
             }
 
-            currentShape.Width = shapeSizeBeforeSizing.offsetX;
-            currentShape.Height = shapeSizeBeforeSizing.offsetY;
+            currentShape.shape.Width = shapeSizeBeforeSizing.offsetX;
+            currentShape.shape.Height = shapeSizeBeforeSizing.offsetY;
         }
 
-        public void SetCurrentShape(Shape shape)
+        public void SetCurrentShape(BaseShape shape)
         {
             currentShape = shape;
         }

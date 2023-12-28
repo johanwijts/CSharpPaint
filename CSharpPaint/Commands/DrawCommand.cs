@@ -1,4 +1,4 @@
-﻿using System.Windows.Shapes;
+﻿using CSharpPaint.Editors.Shapes;
 
 namespace CSharpPaint.Commands
 {
@@ -11,7 +11,7 @@ namespace CSharpPaint.Commands
         }
 
         private readonly Editor editor;
-        private readonly Shape? currentShape;
+        private readonly BaseShape? currentShape;
 
         public override void Execute()
         {

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Windows.Shapes;
+﻿using CSharpPaint.Editors.Shapes;
+using System.Collections.Generic;
 
 namespace CSharpPaint.Commands
 {
@@ -7,7 +7,7 @@ namespace CSharpPaint.Commands
     {
         public SizeGroupCommand
             (Editor Editor,
-            List<Shape> shapes,
+            List<BaseShape> shapes,
             List<double> leafWidthsBeforeSizing,
             List<double> leafHeightsBeforeSizing,
             List<double> leafWidthsAfterSizing,
@@ -22,7 +22,7 @@ namespace CSharpPaint.Commands
         }
 
         private readonly Editor editor;
-        List<Shape> shapes;
+        List<BaseShape> shapes;
         private readonly List<double> leafWidthsBeforeSizing;
         private readonly List<double> leafHeightsBeforeSizing;
         private readonly List<double> leafWidthsAfterSizing;
@@ -34,8 +34,8 @@ namespace CSharpPaint.Commands
 
             foreach (var shape in shapes)
             {
-                shape.Width = leafWidthsAfterSizing[i];
-                shape.Height = leafHeightsAfterSizing[i];
+                shape.shape!.Width = leafWidthsAfterSizing[i];
+                shape.shape!.Height = leafHeightsAfterSizing[i];
                 editor.Finalize_Sizing(shape);
                 i++;
             }
@@ -47,8 +47,8 @@ namespace CSharpPaint.Commands
 
             foreach (var shape in shapes)
             {
-                shape.Width = leafWidthsBeforeSizing[i];
-                shape.Height = leafHeightsBeforeSizing[i];
+                shape.shape!.Width = leafWidthsBeforeSizing[i];
+                shape.shape!.Height = leafHeightsBeforeSizing[i];
                 editor.Finalize_Sizing(shape);
                 i++;
             }

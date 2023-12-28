@@ -1,5 +1,5 @@
-﻿using System.Windows.Controls;
-using System.Windows.Shapes;
+﻿using CSharpPaint.Editors.Shapes;
+using System.Windows.Controls;
 
 namespace CSharpPaint.Commands
 {
@@ -13,7 +13,7 @@ namespace CSharpPaint.Commands
         }
 
         private readonly Editor editor;
-        private readonly Shape? currentShape;
+        private readonly BaseShape? currentShape;
         private readonly (double offsetX, double offsetY) shapePositionOffsetAfterMoving;
         private bool isAlreadyExecuted;
 
@@ -26,8 +26,8 @@ namespace CSharpPaint.Commands
 
             if (isAlreadyExecuted)
             {
-                Canvas.SetLeft(currentShape, Canvas.GetLeft(currentShape) - shapePositionOffsetAfterMoving.offsetX);
-                Canvas.SetTop(currentShape, Canvas.GetTop(currentShape) - shapePositionOffsetAfterMoving.offsetY);
+                Canvas.SetLeft(currentShape.shape, Canvas.GetLeft(currentShape.shape) - shapePositionOffsetAfterMoving.offsetX);
+                Canvas.SetTop(currentShape.shape, Canvas.GetTop(currentShape.shape) - shapePositionOffsetAfterMoving.offsetY);
             }
 
             isAlreadyExecuted = true;
@@ -36,8 +36,13 @@ namespace CSharpPaint.Commands
 
         public override void Undo()
         {
-            Canvas.SetLeft(currentShape, Canvas.GetLeft(currentShape) + shapePositionOffsetAfterMoving.offsetX);
-            Canvas.SetTop(currentShape, Canvas.GetTop(currentShape) + shapePositionOffsetAfterMoving.offsetY);
+            if (currentShape == null)
+            {
+                return;
+            }
+
+            Canvas.SetLeft(currentShape.shape, Canvas.GetLeft(currentShape.shape) + shapePositionOffsetAfterMoving.offsetX);
+            Canvas.SetTop(currentShape.shape, Canvas.GetTop(currentShape.shape) + shapePositionOffsetAfterMoving.offsetY);
         }
     }
 }

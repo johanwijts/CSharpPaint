@@ -1,4 +1,5 @@
 ﻿using CSharpPaint.Commands;
+using CSharpPaint.Editors.Shapes;
 using CSharpPaint.Invokers;
 using System.Collections.Generic;
 using System.Windows;
@@ -26,7 +27,7 @@ namespace CSharpPaint.Compositions
                 return;
             }
 
-            var shapes = new List<Shape>();
+            var shapes = new List<BaseShape>();
             var leafPositions = new List<Point>();
             var leafPositionsBeforeMoving = new List<Point>();
             var leafPositionsAfterMoving = new List<Point>();
@@ -38,7 +39,7 @@ namespace CSharpPaint.Compositions
                     shapes.Add(((Leaf)component).shape);
 
                     var leaf = (Leaf)component;
-                    var leafPoint = new Point(Canvas.GetLeft(leaf.shape), Canvas.GetTop(leaf.shape));
+                    var leafPoint = new Point(Canvas.GetLeft(leaf.shape.shape), Canvas.GetTop(leaf.shape.shape));
                     leafPositions.Add(leafPoint);
                     leafPositionsBeforeMoving.Add(leafPoint);
                 }
@@ -64,7 +65,7 @@ namespace CSharpPaint.Compositions
                 {
                     component.MoveOperation(compositeMiddle);
                     var leaf = (Leaf)component;
-                    var leafPoint = new Point(Canvas.GetLeft(leaf.shape), Canvas.GetTop(leaf.shape));
+                    var leafPoint = new Point(Canvas.GetLeft(leaf.shape.shape), Canvas.GetTop(leaf.shape.shape));
                     leafPositionsAfterMoving.Add(leafPoint);
                 }
             }
@@ -79,7 +80,7 @@ namespace CSharpPaint.Compositions
                 return;
             }
 
-            var shapes = new List<Shape>();
+            var shapes = new List<BaseShape>();
             var leafWidthsBeforeSizing = new List<double>();
             var leafHeightsBeforeSizing = new List<double>();
             var leafWidthsAfterSizing = new List<double>();
@@ -92,8 +93,8 @@ namespace CSharpPaint.Compositions
                     shapes.Add(((Leaf)component).shape);
 
                     var leaf = (Leaf)component;
-                    leafWidthsBeforeSizing.Add(leaf.shape.Width);
-                    leafHeightsBeforeSizing.Add(leaf.shape.Height);
+                    leafWidthsBeforeSizing.Add(leaf.shape.shape!.Width);
+                    leafHeightsBeforeSizing.Add(leaf.shape.shape!.Height);
                 } 
             }
 
@@ -103,8 +104,8 @@ namespace CSharpPaint.Compositions
                 {
                     component.SizeOperation(sizeDifference);
                     var leaf = (Leaf)component;
-                    leafWidthsAfterSizing.Add(leaf.shape.Width);
-                    leafHeightsAfterSizing.Add(leaf.shape.Height);
+                    leafWidthsAfterSizing.Add(leaf.shape.shape!.Width);
+                    leafHeightsAfterSizing.Add(leaf.shape.shape!.Height);
                 }
             }
 
