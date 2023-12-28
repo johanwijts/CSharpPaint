@@ -1,5 +1,6 @@
 ﻿using CSharpPaint.Compositions;
 using CSharpPaint.Editors.Shapes;
+using CSharpPaint.Visitors;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -34,6 +35,16 @@ namespace CSharpPaint
         public BaseShape? GetCurrentShape()
         {
             return currentShape;
+        }
+
+        public Point GetlastMousePosition()
+        {
+            return lastMousePosition;
+        }
+
+        public void SetlastMousePosition(Point newLastMousePosition)
+        {
+            lastMousePosition = newLastMousePosition;
         }
 
         public (double offsetX, double offsetY) GetShapePositionOffsetAfterMoving()
@@ -97,7 +108,8 @@ namespace CSharpPaint
         {
             if (isDragging)
             {
-                Handle_Dragging(e, currentShape!);
+                IVisitor visitor = new DragVisitor(this, canvas, e);
+                visitor.Visit(currentShape);
             }
             else if (isDrawing && currentShape?.shape != null)
             {
@@ -121,18 +133,6 @@ namespace CSharpPaint
             }
         }
 
-        public void Handle_Dragging(MouseEventArgs e, BaseShape shapeToMove)
-        {
-            Point currentPosition = e.GetPosition(canvas);
-            double offsetX = currentPosition.X - lastMousePosition.X;
-            double offsetY = currentPosition.Y - lastMousePosition.Y;
-
-            Canvas.SetLeft(shapeToMove.shape, Canvas.GetLeft(shapeToMove.shape) + offsetX);
-            Canvas.SetTop(shapeToMove.shape, Canvas.GetTop(shapeToMove.shape) + offsetY);
-
-            lastMousePosition = currentPosition;
-        }
-
         public void Handle_Group_Dragging(MouseButtonEventArgs e, BaseShape shapeToMove)
         {
             Point mousePosition = e.GetPosition(canvas);
@@ -142,7 +142,8 @@ namespace CSharpPaint
             isDragging = true;
             lastMousePosition = mousePosition;
 
-            Handle_Dragging(e, shapeToMove);
+            IVisitor visitor = new DragVisitor(this, canvas, e);
+            visitor.Visit(shapeToMove);
         }
 
         private void Handle_Drawing(MouseEventArgs e)

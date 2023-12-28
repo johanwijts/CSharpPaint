@@ -4,6 +4,6 @@ namespace CSharpPaint.Visitors
 {
     public interface IVisitor
     {
-        void Visit(BaseShape baseShape);
+        void Visit(BaseShape shapeToMove);
     }
 }
