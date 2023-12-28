@@ -117,20 +117,10 @@ namespace CSharpPaint
             }
         }
 
-        public void Handle_Sizing(object sender, MouseWheelEventArgs e, BaseShape? shapeToSize)
+        public void Handle_Sizing(MouseWheelEventArgs e, BaseShape? shapeToSize)
         {
-            if (isSizing && shapeToSize?.shape != null)
-            {
-                // Adjust the width and height based on the mouse wheel delta
-                double delta = e.Delta / 120.0;
-                double scaleFactor = 1.1;
-
-                double newWidth = shapeToSize.shape.Width * Math.Pow(scaleFactor, delta);
-                double newHeight = shapeToSize.shape.Height * Math.Pow(scaleFactor, delta);
-
-                shapeToSize.shape.Width = Math.Max(newWidth, 1);
-                shapeToSize.shape.Height = Math.Max(newHeight, 1);
-            }
+            IVisitor visitor = new SizeVisitor(this, canvas, e);
+            visitor.Visit(shapeToSize!);
         }
 
         public void Handle_Group_Dragging(MouseButtonEventArgs e, BaseShape shapeToMove)

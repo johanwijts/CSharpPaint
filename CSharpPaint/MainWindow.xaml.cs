@@ -88,7 +88,7 @@ namespace CSharpPaint
                 return;
             }
 
-            editor.Handle_Sizing(sender, e, editor.GetCurrentShape());
+            editor.Handle_Sizing(e, editor.GetCurrentShape());
         }
 
         private void Canvas_MouseUp(object sender, MouseButtonEventArgs e)
