@@ -1,5 +1,6 @@
 ﻿using CSharpPaint.Compositions;
 using CSharpPaint.Editors.Shapes;
+using CSharpPaint.Strategies;
 using CSharpPaint.Visitors;
 using System;
 using System.Windows;
@@ -31,6 +32,7 @@ namespace CSharpPaint
         private (double width, double height) shapeSizeBeforeSizing;
         private bool isDragging;
         private Point lastMousePosition;
+        private IStrategy strategy;
 
         public BaseShape? GetCurrentShape()
         {
@@ -45,6 +47,26 @@ namespace CSharpPaint
         public void SetlastMousePosition(Point newLastMousePosition)
         {
             lastMousePosition = newLastMousePosition;
+        }
+
+        public void SetSavingStrategy(IStrategy strategy)
+        {
+            this.strategy = strategy;
+        }
+
+        public void Save()
+        {
+            // This is a test to see if the strategy pattern works,
+            // in a ideal situation you would create the strategy from the UI.
+            // For example the path would be a textbox and the resolution would be a dropdown.
+            // Then some logic would be used to determine which strategy to use.
+            var window = Window.GetWindow(canvas);
+            // Replace with your own path
+            var path = "F:\\Repos\\CSharpPaint2.0\\Output\\CSharpPic.png";
+            IStrategy strategy = new SaveAsPng(window, canvas, 96, path);
+
+
+            strategy.Execute();
         }
 
         public (double offsetX, double offsetY) GetShapePositionOffsetAfterMoving()
