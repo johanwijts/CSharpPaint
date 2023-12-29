@@ -7,15 +7,13 @@ namespace CSharpPaint.Visitors
 {
     public class SizeVisitor : IVisitor
     {
-        public SizeVisitor(Editor editor, Canvas canvas, MouseWheelEventArgs e)
+        public SizeVisitor(Editor editor, MouseWheelEventArgs e)
         {
             this.editor = editor;
-            this.canvas = canvas;
             this.e = e;
         }
 
         private readonly Editor editor;
-        private readonly Canvas canvas;
         private readonly MouseWheelEventArgs e;
 
         public void Visit(BaseShape baseShape)

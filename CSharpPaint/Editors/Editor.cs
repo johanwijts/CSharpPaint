@@ -141,7 +141,7 @@ namespace CSharpPaint
 
         public void Handle_Sizing(MouseWheelEventArgs e, BaseShape? shapeToSize)
         {
-            IVisitor visitor = new SizeVisitor(this, canvas, e);
+            IVisitor visitor = new SizeVisitor(this, e);
             visitor.Visit(shapeToSize!);
         }
 

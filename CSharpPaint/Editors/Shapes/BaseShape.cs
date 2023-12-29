@@ -20,10 +20,21 @@ namespace CSharpPaint.Editors.Shapes
 
         public double width;
         public double height;
+        private string description;
 
         public void Accept(IVisitor visitor)
         {
             visitor.Visit(this);
+        }
+
+        public string GetDescription()
+        {
+            return this.description;
+        }
+
+        public void SetDescription(string description)
+        {
+            this.description = description;
         }
     }
 }

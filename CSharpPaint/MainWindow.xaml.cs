@@ -142,6 +142,12 @@ namespace CSharpPaint
                 keyIsDown = true;
                 invoker.Redo();
             }
+            else if (e.Key == Key.T && Keyboard.Modifiers == ModifierKeys.Control && !leftMouseButtonDown && !keyIsDown)
+            {
+                keyIsDown = true;
+                var textCommand = new TextCommand(editor);
+                invoker.Execute(textCommand);
+            }
             else if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control && !leftMouseButtonDown && !keyIsDown)
             {
                 keyIsDown = true;
