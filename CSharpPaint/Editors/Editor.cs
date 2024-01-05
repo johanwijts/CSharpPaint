@@ -11,13 +11,35 @@ using System.Windows.Shapes;
 
 namespace CSharpPaint
 {
-    public class Editor
+    public sealed class Editor
     {
-        public Editor(Canvas Canvas,RadioButton RectangleRadioButton, RadioButton EllipseRadioButton)
+        private static Editor? instance = null;
+
+        static Editor()
+        {
+        }
+
+        private Editor(Canvas Canvas,RadioButton RectangleRadioButton, RadioButton EllipseRadioButton)
         {
             this.canvas = Canvas;
             this.rectangleRadioButton = RectangleRadioButton;
             this.ellipseRadioButton = EllipseRadioButton;
+        }
+
+        public static Editor? GetInstance()
+        {
+            return instance;
+        }
+
+        public static Editor SetInstance(Canvas Canvas, RadioButton RectangleRadioButton, RadioButton EllipseRadioButton)
+        {
+            if (instance != null)
+            {
+                Console.WriteLine("Editor instance exists.");
+            }
+            
+            instance = new Editor(Canvas, RectangleRadioButton, EllipseRadioButton);
+            return instance;
         }
 
         public Canvas canvas;

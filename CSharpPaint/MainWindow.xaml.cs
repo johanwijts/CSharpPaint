@@ -25,7 +25,7 @@ namespace CSharpPaint
         public MainWindow()
         {
             InitializeComponent();
-            editor = new Editor
+            editor = Editor.SetInstance
                 (canvas,
                 rectangleRadioButton,
                 ellipseRadioButton);
